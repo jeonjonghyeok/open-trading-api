@@ -139,6 +139,7 @@ next-env.d.ts
 .env
 .env.local
 .env.*.local
+**/.env.paper
 *.pem
 
 # ===== Logs =====
@@ -152,6 +153,10 @@ yarn-error.log*
 # ===== Lock files =====
 *.lock
 
+# ===== Trading engine runtime (local) =====
+trading-system/data/cache/
+trading-system/data/orders/
+
 # ===== KIS (민감 정보) =====
 KIS/
 .master/
@@ -163,6 +168,7 @@ KIS/
 # ===== Claude Code =====
 .claude/logs/*.log
 .claude/settings.local.json
+.claude/worktrees/
 
 # ===== p2 output artifacts (regeneratable) =====
 backtester/examples/output/reports/*.html

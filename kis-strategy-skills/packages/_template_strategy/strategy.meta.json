@@ -1,0 +1,11 @@
+{
+  "id": "team.template_strategy",
+  "version": "0.0.0",
+  "skill_kind": "strategy",
+  "name": "전략 템플릿 (복사 후 수정)",
+  "summary": "catalog.json 및 이 메타의 id/version을 실제 값으로 교체",
+  "profit_priority": "백테스트 요약 또는 기대수익 논거를 채운다",
+  "downstream_consumers": ["strategy-implementer"],
+  "upstream_sources": ["strategy_builder export 또는 .kis.yaml 경로"],
+  "catalog_sync": "kis-strategy-skills/marketplace/catalog.json"
+}

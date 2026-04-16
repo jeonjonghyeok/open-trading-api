@@ -1,0 +1,12 @@
+{
+  "id": "example.placeholder",
+  "version": "0.0.0",
+  "skill_kind": "strategy",
+  "name": "플레이스홀더",
+  "summary": "catalog.schema.json 및 skill_kind 필드 예시",
+  "profit_priority": "실제 스킬 등록 시 백테스트·기대수익 근거로 교체",
+  "downstream_consumers": ["strategy-implementer"],
+  "upstream_sources": [],
+  "catalog_sync": "kis-strategy-skills/marketplace/catalog.json",
+  "notes": "실제 스킬은 KIS Strategy Builder export + KIS Backtest 리포트 경로를 채운다."
+}

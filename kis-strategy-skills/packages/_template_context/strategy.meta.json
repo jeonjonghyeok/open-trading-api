@@ -1,0 +1,11 @@
+{
+  "id": "team.template_context",
+  "version": "0.0.0",
+  "skill_kind": "market_context",
+  "name": "맥락 스킬 템플릿 (복사 후 수정)",
+  "summary": "news_context로 바꿀 경우 skill_kind와 이름을 수정",
+  "profit_priority": "이 맥락이 수익 판단에 어떻게 도움이 되는지 한 줄",
+  "downstream_consumers": ["strategy-implementer", "strategy-reviewer"],
+  "upstream_sources": ["예: 뉴스 API, 지수 시계열 경로"],
+  "catalog_sync": "kis-strategy-skills/marketplace/catalog.json"
+}

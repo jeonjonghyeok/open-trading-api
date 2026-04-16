@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-trading-api.local/kis-strategy-skills/catalog.schema.json",
+  "title": "KIS Strategy Skills Marketplace Catalog",
+  "type": "object",
+  "required": ["version", "skills"],
+  "properties": {
+    "version": { "type": "string", "description": "카탈로그 포맷 버전 (예: 1)" },
+    "skills": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/skillEntry" }
+    }
+  },
+  "$defs": {
+    "skillEntry": {
+      "type": "object",
+      "required": ["id", "version", "name", "package_path", "skill_kind"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+        "version": { "type": "string" },
+        "name": { "type": "string" },
+        "skill_kind": {
+          "type": "string",
+          "enum": ["strategy", "market_context", "news_context"],
+          "description": "strategy=매매 실행 후보, market_context/news_context=맥락·정보(주문 없음)"
+        },
+        "summary": { "type": "string" },
+        "package_path": {
+          "type": "string",
+          "description": "저장소 루트 기준 상대 경로 (예: kis-strategy-skills/packages/momentum_v1/)"
+        },
+        "source_kis_yaml": {
+          "type": "string",
+          "description": "참조용 원본 .kis.yaml (런타임 직접 파싱 금지 원칙 — 스킬 패키지가 단일 진입점)"
+        },
+        "backtest": {
+          "type": "object",
+          "properties": {
+            "engine": { "type": "string", "enum": ["kis_backtest", "other"] },
+            "report_path": { "type": "string" },
+            "verified_at": { "type": "string", "format": "date" }
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "시장 국면·스타일 태그 (implementer 선택 힌트)"
+        },
+        "risk_tier": { "type": "string", "enum": ["low", "medium", "high"] }
+      }
+    }
+  }
+}

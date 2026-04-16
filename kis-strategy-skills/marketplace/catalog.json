@@ -1,0 +1,21 @@
+{
+  "version": "1",
+  "skills": [
+    {
+      "id": "example.placeholder",
+      "version": "0.0.0",
+      "skill_kind": "strategy",
+      "name": "플레이스홀더 (실제 스킬 등록 시 삭제)",
+      "summary": "카탈로그 포맷 예시. Builder+Backtest 검증 후 패키지로 교체한다.",
+      "package_path": "kis-strategy-skills/packages/_example/",
+      "source_kis_yaml": "backtester/kis_backtest/file/templates/momentum.kis.yaml",
+      "backtest": {
+        "engine": "kis_backtest",
+        "report_path": "",
+        "verified_at": ""
+      },
+      "tags": ["example"],
+      "risk_tier": "low"
+    }
+  ]
+}

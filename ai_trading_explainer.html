@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 자동 주식 거래 시스템</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0f1e;
+    --bg2: #111827;
+    --bg3: #1a2236;
+    --card: #141e30;
+    --border: rgba(255,255,255,0.08);
+    --teal: #10d9a0;
+    --teal2: #0ea87a;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+    --coral: #f97316;
+    --amber: #fbbf24;
+    --red: #ef4444;
+    --text: #f0f4ff;
+    --text2: #94a3b8;
+    --text3: #64748b;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 30% 40%, rgba(16,217,160,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 70% 60%, rgba(59,130,246,0.10) 0%, transparent 60%);
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(16,217,160,0.1);
+    border: 1px solid rgba(16,217,160,0.3);
+    border-radius: 100px;
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--teal);
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .badge-dot {
+    width: 7px; height: 7px;
+    background: var(--teal);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.3)} }
+  .hero h1 {
+    font-size: clamp(32px, 6vw, 64px);
+    font-weight: 900;
+    line-height: 1.15;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .hero h1 .accent { color: var(--teal); }
+  .hero-sub {
+    font-size: clamp(15px, 2.5vw, 20px);
+    color: var(--text2);
+    max-width: 560px;
+    margin-bottom: 48px;
+    font-weight: 300;
+    position: relative;
+  }
+  .hero-stats {
+    display: flex;
+    gap: 40px;
+    position: relative;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--teal);
+    display: block;
+  }
+  .stat-label { font-size: 12px; color: var(--text3); }
+
+  /* ── SECTIONS ── */
+  section {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 80px 24px;
+  }
+  .section-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 12px;
+  }
+  h2 {
+    font-size: clamp(24px, 4vw, 38px);
+    font-weight: 700;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+  .section-desc {
+    font-size: 16px;
+    color: var(--text2);
+    max-width: 600px;
+    margin-bottom: 48px;
+    font-weight: 300;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  /* ── CONCEPT CARDS ── */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+  .concept-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .concept-card:hover { border-color: rgba(16,217,160,0.3); transform: translateY(-2px); }
+  .concept-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent-color, var(--teal));
+  }
+  .concept-icon {
+    font-size: 28px;
+    margin-bottom: 14px;
+    display: block;
+  }
+  .concept-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .concept-card p { font-size: 14px; color: var(--text2); line-height: 1.6; }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 32px;
+  }
+  .flow-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--text3);
+    text-align: center;
+    margin-bottom: 36px;
+    text-transform: uppercase;
+  }
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 0;
+  }
+  .flow-step {
+    flex: 1;
+    text-align: center;
+    padding: 20px 12px;
+    border-radius: 12px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    min-width: 0;
+  }
+  .flow-step .step-icon { font-size: 22px; margin-bottom: 8px; }
+  .flow-step .step-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .flow-step .step-desc { font-size: 11px; color: var(--text3); }
+  .flow-step.highlight { border-color: rgba(16,217,160,0.4); background: rgba(16,217,160,0.07); }
+  .flow-step.highlight .step-title { color: var(--teal); }
+  .flow-arrow {
+    width: 32px;
+    flex-shrink: 0;
+    text-align: center;
+    color: var(--text3);
+    font-size: 18px;
+  }
+
+  /* ── ROUTINE CARDS ── */
+  .routine-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .routine-card {
+    border-radius: 14px;
+    padding: 24px 20px;
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  .routine-card.c1 { background: rgba(16,217,160,0.08); border-color: rgba(16,217,160,0.25); }
+  .routine-card.c2 { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.25); }
+  .routine-card.c3 { background: rgba(249,115,22,0.08); border-color: rgba(249,115,22,0.25); }
+  .routine-card.c4 { background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.25); }
+  .routine-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    opacity: 0.6;
+    margin-bottom: 8px;
+  }
+  .routine-name { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .routine-time { font-size: 12px; opacity: 0.6; margin-bottom: 12px; }
+  .routine-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  /* ── STRATEGY SKILL ── */
+  .skill-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 640px) { .skill-wrap { grid-template-columns: 1fr; } }
+  .skill-list { display: flex; flex-direction: column; gap: 12px; }
+  .skill-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: border-color 0.2s;
+    cursor: default;
+  }
+  .skill-item:hover { border-color: rgba(16,217,160,0.3); }
+  .skill-status {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .skill-status.active { background: var(--teal); box-shadow: 0 0 8px var(--teal); }
+  .skill-status.paused { background: var(--text3); }
+  .skill-status.experiment { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+  .skill-info { flex: 1; min-width: 0; }
+  .skill-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .skill-detail { font-size: 12px; color: var(--text3); }
+  .skill-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 100px;
+    flex-shrink: 0;
+  }
+  .skill-badge.active { background: rgba(16,217,160,0.15); color: var(--teal); }
+  .skill-badge.paused { background: rgba(100,116,139,0.2); color: var(--text3); }
+  .skill-badge.experiment { background: rgba(251,191,36,0.15); color: var(--amber); }
+
+  .skill-explain {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+  }
+  .skill-explain h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+  .explain-step {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 18px;
+    align-items: flex-start;
+  }
+  .explain-step:last-child { margin-bottom: 0; }
+  .explain-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: rgba(16,217,160,0.15);
+    color: var(--teal);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .explain-text { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  .explain-text strong { color: var(--text); font-weight: 600; }
+
+  /* ── TIMELINE ── */
+  .timeline-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px 32px;
+    overflow-x: auto;
+  }
+  .timeline-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    min-width: 560px;
+    margin-bottom: 16px;
+  }
+  .timeline-label {
+    width: 90px;
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text3);
+    padding-right: 16px;
+  }
+  .timeline-bar-wrap { flex: 1; position: relative; height: 36px; }
+  .timeline-bar {
+    position: absolute;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    padding: 0 12px;
+    top: 2px;
+  }
+  .t-teal { background: rgba(16,217,160,0.2); color: var(--teal); border: 1px solid rgba(16,217,160,0.3); }
+  .t-blue { background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+  .t-coral { background: rgba(249,115,22,0.2); color: #fb923c; border: 1px solid rgba(249,115,22,0.3); }
+  .t-purple { background: rgba(139,92,246,0.2); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); }
+  .timeline-axis {
+    display: flex;
+    min-width: 560px;
+    padding-left: 90px;
+    margin-top: 8px;
+  }
+  .axis-tick {
+    flex: 1;
+    font-size: 11px;
+    color: var(--text3);
+    text-align: left;
+  }
+
+  /* ── PHONE SECTION ── */
+  .phone-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  @media (max-width: 640px) { .phone-wrap { grid-template-columns: 1fr; } }
+
+  .phone-mockup {
+    width: 240px;
+    margin: 0 auto;
+    background: #1a1a2e;
+    border-radius: 40px;
+    padding: 20px 16px;
+    border: 2px solid rgba(255,255,255,0.1);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+    position: relative;
+  }
+  .phone-notch {
+    width: 80px; height: 20px;
+    background: #1a1a2e;
+    border-radius: 0 0 14px 14px;
+    margin: 0 auto 16px;
+    border: 2px solid rgba(255,255,255,0.08);
+    border-top: none;
+  }
+  .phone-screen {
+    background: var(--bg2);
+    border-radius: 26px;
+    padding: 16px 12px;
+    min-height: 360px;
+  }
+  .chat-header {
+    text-align: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 14px;
+  }
+  .chat-header .chat-name { font-size: 13px; font-weight: 700; }
+  .chat-header .chat-sub { font-size: 10px; color: var(--teal); }
+  .chat-bubble {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+  .chat-bubble.me { align-items: flex-end; }
+  .chat-bubble.ai { align-items: flex-start; }
+  .bubble-text {
+    max-width: 85%;
+    padding: 8px 12px;
+    border-radius: 14px;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  .me .bubble-text {
+    background: var(--teal);
+    color: #0a1a14;
+    font-weight: 500;
+    border-bottom-right-radius: 4px;
+  }
+  .ai .bubble-text {
+    background: var(--bg3);
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+  }
+  .bubble-time { font-size: 9px; color: var(--text3); margin-top: 3px; padding: 0 4px; }
+
+  .phone-features { display: flex; flex-direction: column; gap: 16px; }
+  .phone-feat {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 18px 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    transition: border-color 0.2s;
+  }
+  .phone-feat:hover { border-color: rgba(16,217,160,0.3); }
+  .feat-icon { font-size: 22px; flex-shrink: 0; }
+  .feat-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .feat-desc { font-size: 12px; color: var(--text2); }
+
+  /* ── EFFECT ── */
+  .effect-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  .effect-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 24px;
+    text-align: center;
+  }
+  .effect-icon { font-size: 36px; margin-bottom: 14px; display: block; }
+  .effect-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .effect-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  /* ── SHEETS SECTION ── */
+  .data-split {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .data-col {
+    border-radius: 16px;
+    padding: 24px 20px;
+    border: 1px solid var(--border);
+  }
+  .data-col.sheets { border-color: rgba(16,217,160,0.35); background: rgba(16,217,160,0.06); }
+  .data-col.local  { border-color: rgba(59,130,246,0.3);  background: rgba(59,130,246,0.05); }
+  .data-col.files  { border-color: rgba(139,92,246,0.3);  background: rgba(139,92,246,0.05); }
+
+  .data-col-title {
+    font-size: 14px; font-weight: 700; margin-bottom: 4px;
+  }
+  .data-col-sub { font-size: 12px; margin-bottom: 16px; opacity: 0.6; }
+  .data-item {
+    display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px;
+  }
+  .data-item:last-child { margin-bottom: 0; }
+  .data-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    flex-shrink: 0; margin-top: 6px;
+  }
+  .dot-green  { background: var(--teal); }
+  .dot-blue   { background: var(--blue); }
+  .dot-purple { background: var(--purple); }
+  .data-item-label { font-size: 13px; font-weight: 600; }
+  .data-item-desc  { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  .sheets-mockup {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .sheets-topbar {
+    background: rgba(255,255,255,0.04);
+    padding: 10px 16px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sheets-title { font-size: 13px; font-weight: 600; color: var(--teal); }
+  .sheets-link {
+    font-size: 11px; color: var(--text3);
+    background: rgba(255,255,255,0.06);
+    padding: 3px 10px; border-radius: 100px;
+  }
+  .sheets-tabs-row {
+    display: flex; gap: 0;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+    padding: 0 16px; overflow-x: auto;
+  }
+  .s-tab {
+    padding: 8px 14px; font-size: 12px; font-weight: 500;
+    color: var(--text3); border-bottom: 2px solid transparent;
+    white-space: nowrap; cursor: default;
+  }
+  .s-tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+  .sheets-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .sheets-tbl th {
+    background: rgba(255,255,255,0.03); padding: 8px 14px;
+    text-align: left; font-size: 11px; font-weight: 600;
+    color: var(--text3); border-bottom: 1px solid var(--border);
+  }
+  .sheets-tbl td {
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--text);
+  }
+  .sheets-tbl tr:last-child td { border-bottom: none; }
+  .cell-g { color: var(--teal); font-weight: 600; }
+  .cell-r { color: var(--red);  font-weight: 600; }
+  .stag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 100px;
+  }
+  .stag-on  { background: rgba(16,217,160,0.15); color: var(--teal); }
+  .stag-off { background: rgba(100,116,139,0.15); color: var(--text3); }
+
+  .sync-note {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: rgba(16,217,160,0.07);
+    border: 1px solid rgba(16,217,160,0.2);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 13px; color: var(--text2);
+  }
+
+  /* ── SKILL MAP ── */
+  .skill-map-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .sk-card {
+    border-radius: 10px; padding: 14px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+    position: relative; overflow: hidden;
+  }
+  .sk-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  }
+  .sk-card.sk-mcp     { border-color: rgba(59,130,246,0.3);  }
+  .sk-card.sk-mcp::before     { background: var(--blue); }
+  .sk-card.sk-new     { border-color: rgba(249,115,22,0.25); }
+  .sk-card.sk-new::before     { background: var(--coral); }
+  .sk-card.sk-partial { border-color: rgba(251,191,36,0.25); }
+  .sk-card.sk-partial::before { background: var(--amber); }
+  .sk-card.sk-exists  { border-color: rgba(16,217,160,0.25); }
+  .sk-card.sk-exists::before  { background: var(--teal); }
+  .sk-card.sk-sheets  { border-color: rgba(16,217,160,0.4); background: rgba(16,217,160,0.05); }
+  .sk-card.sk-sheets::before  { background: var(--teal); }
+  .sk-card.sk-dim { opacity: 0.4; }
+
+  .sk-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; margin-bottom: 5px; }
+  .sk-name { font-size: 12px; font-weight: 600; }
+  .sk-name.crossed { text-decoration: line-through; opacity: 0.5; }
+  .sk-badge {
+    font-size: 9px; font-weight: 700; padding: 2px 7px;
+    border-radius: 100px; flex-shrink: 0;
+  }
+  .sb-mcp     { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .sb-new     { background: rgba(249,115,22,0.15); color: #fb923c; }
+  .sb-partial { background: rgba(251,191,36,0.15); color: var(--amber); }
+  .sb-exists  { background: rgba(16,217,160,0.15); color: var(--teal); }
+  .sb-sheets  { background: rgba(16,217,160,0.2); color: var(--teal); }
+  .sk-desc { font-size: 11px; color: var(--text3); line-height: 1.4; }
+
+  .sk-cat-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--text3);
+    margin: 20px 0 10px; padding-left: 10px;
+    border-left: 3px solid rgba(255,255,255,0.15);
+  }
+  .sk-legend {
+    display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px;
+  }
+  .sk-leg { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); }
+  .sk-leg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .sk-summary {
+    display: flex; gap: 24px; flex-wrap: wrap;
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px; margin-top: 8px;
+  }
+  .sk-sum-item { text-align: center; }
+  .sk-sum-num { font-size: 22px; font-weight: 700; display: block; }
+  .sk-sum-lbl { font-size: 11px; color: var(--text3); }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--text3);
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── SYSTEM DIAGRAM ── */
+  .sys-diagram {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px 28px;
+  }
+  .sys-center {
+    background: rgba(16,217,160,0.08);
+    border: 1.5px solid rgba(16,217,160,0.3);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .sys-center h3 { font-size: 16px; font-weight: 700; color: var(--teal); margin-bottom: 4px; }
+  .sys-center p { font-size: 12px; color: var(--text2); }
+  .sys-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    justify-content: center;
+  }
+  .sys-node {
+    flex: 1;
+    max-width: 180px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+  .sys-node .node-icon { font-size: 18px; margin-bottom: 6px; }
+  .sys-node .node-label { font-size: 12px; font-weight: 600; }
+  .sys-node .node-sub { font-size: 10px; color: var(--text3); margin-top: 3px; }
+  .sys-arrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text3);
+    font-size: 20px;
+    margin: 4px 0;
+  }
+
+  .note-box {
+    background: rgba(251,191,36,0.07);
+    border: 1px solid rgba(251,191,36,0.2);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-top: 24px;
+    font-size: 13px;
+    color: var(--text2);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .note-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+</style>
+</head>
+<body>
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+  <div class="hero-badge">
+    <span class="badge-dot"></span>
+    자동 운용 시스템 구상안
+  </div>
+  <h1>AI가 <span class="accent">24시간</span><br>주식을 대신 거래합니다</h1>
+  <p class="hero-sub">사람이 직접 차트를 보지 않아도, AI가 시장을 분석하고 전략을 선택하고 주문을 실행합니다. 결과를 바탕으로 스스로 전략을 개선합니다.</p>
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-num">24/7</span>
+      <span class="stat-label">무중단 모니터링</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">5분</span>
+      <span class="stat-label">신호 감지 주기</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">AI</span>
+      <span class="stat-label">자율 전략 진화</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══ 핵심 개념 ═══ -->
+<section>
+  <span class="section-tag">핵심 개념</span>
+  <h2>이 시스템이 하는 일</h2>
+  <p class="section-desc">기존에 사람이 직접 하던 3가지 일을 AI가 대신합니다.</p>
+
+  <div class="concept-grid">
+    <div class="concept-card" style="--accent-color: var(--teal)">
+      <span class="concept-icon">📊</span>
+      <h3>시장 분석</h3>
+      <p>주가, 거래량, 추세를 실시간으로 파악하고 매수/매도 시점을 판단합니다. 사람이 차트를 볼 필요가 없습니다.</p>
+    </div>
+    <div class="concept-card" style="--accent-color: var(--blue)">
+      <span class="concept-icon">⚡</span>
+      <h3>자동 주문 실행</h3>
+      <p>판단이 내려지면 한국투자증권 API를 통해 즉시 주문을 넣습니다. 사람이 매매 버튼을 누를 필요가 없습니다.</p>
+    </div>
+    <div class="concept-card" style="--accent-color: var(--purple)">
+      <span class="concept-icon">🧠</span>
+      <h3>전략 자동 개선</h3>
+      <p>거래 결과를 분석해 잘 통하는 전략은 더 강화하고, 성과가 부진한 전략은 자동으로 수정하거나 교체합니다.</p>
+    </div>
+  </div>
+
+  <!-- 전체 흐름 -->
+  <div class="flow-wrap">
+    <div class="flow-title">전체 동작 흐름</div>
+    <div class="flow-row">
+      <div class="flow-step">
+        <div class="step-icon">📈</div>
+        <div class="step-title">시장 데이터 수집</div>
+        <div class="step-desc">주가·거래량을 DB에 저장</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="step-icon">🔍</div>
+        <div class="step-title">조건 1차 검사</div>
+        <div class="step-desc">간단한 규칙으로 신호 필터링</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step highlight">
+        <div class="step-icon">🤖</div>
+        <div class="step-title">AI 판단</div>
+        <div class="step-desc">신호 있을 때만 AI 호출</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="step-icon">📋</div>
+        <div class="step-title">주문 실행</div>
+        <div class="step-desc">KIS API로 매수/매도</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="step-icon">📝</div>
+        <div class="step-title">결과 기록</div>
+        <div class="step-desc">전략별 성과 DB 저장</div>
+      </div>
+    </div>
+    <div class="note-box" style="margin-top:24px;">
+      <span class="note-icon">💡</span>
+      <span><strong style="color:var(--text)">AI를 무분별하게 부르지 않습니다.</strong> 아무 신호도 없는 평범한 시간엔 간단한 규칙으로만 체크하고 AI 판단은 건너뜁니다. 실제로 의미 있는 변화가 감지될 때만 AI가 개입합니다.</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ 4가지 루틴 ═══ -->
+<section>
+  <span class="section-tag">자동화 구조</span>
+  <h2>4가지 자동 루틴</h2>
+  <p class="section-desc">시스템은 4개의 자동 작업이 시간대별로 맞물려 돌아갑니다. 모두 사람의 개입 없이 실행됩니다.</p>
+
+  <div class="routine-grid">
+    <div class="routine-card c1">
+      <div class="routine-num">루틴 1</div>
+      <div class="routine-name">데이터 수집</div>
+      <div class="routine-time">⏰ 매일 장 마감 후 16:30</div>
+      <div class="routine-desc">오늘 주가와 거래량 데이터를 가져와 저장합니다. 내일 분석의 재료가 됩니다.</div>
+    </div>
+    <div class="routine-card c2">
+      <div class="routine-num">루틴 2</div>
+      <div class="routine-name">매매 트리거</div>
+      <div class="routine-time">⏰ 장중 5분마다 (09:00~15:25)</div>
+      <div class="routine-desc">주식 시장이 열려 있는 동안 5분마다 신호를 확인하고, 조건이 맞으면 주문을 냅니다.</div>
+    </div>
+    <div class="routine-card c3">
+      <div class="routine-num">루틴 3</div>
+      <div class="routine-name">일일 성과 분석</div>
+      <div class="routine-time">⏰ 매일 17:00</div>
+      <div class="routine-desc">오늘 거래 결과를 전략별로 분석합니다. 어떤 전략이 효과 있었는지 기록합니다.</div>
+    </div>
+    <div class="routine-card c4">
+      <div class="routine-num">루틴 4</div>
+      <div class="routine-name">전략 진화</div>
+      <div class="routine-time">⏰ 매주 월요일 08:30</div>
+      <div class="routine-desc">4주간 성과를 검토해 부진한 전략을 교체하거나 수치를 조정합니다. AI가 스스로 판단합니다.</div>
+    </div>
+  </div>
+
+  <!-- 타임라인 -->
+  <div class="timeline-wrap" style="margin-top:24px;">
+    <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:20px;">하루 타임라인</div>
+    <div class="timeline-row">
+      <div class="timeline-label">루틴 2<br><span style="color:var(--text3);font-size:10px;">매매 트리거</span></div>
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar t-teal" style="left:0%;width:73%;">5분마다 신호 감지 · 주문 실행</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="timeline-label">루틴 1<br><span style="color:var(--text3);font-size:10px;">데이터 수집</span></div>
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar t-blue" style="left:76%;width:14%;">일봉 수집</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="timeline-label">루틴 3<br><span style="color:var(--text3);font-size:10px;">성과 분석</span></div>
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar t-coral" style="left:89%;width:11%;">분석</div>
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="timeline-label">루틴 4<br><span style="color:var(--text3);font-size:10px;">전략 진화</span></div>
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar t-purple" style="left:0%;width:10%;">월요일만</div>
+      </div>
+    </div>
+    <div class="timeline-axis">
+      <div class="axis-tick">09:00</div>
+      <div class="axis-tick" style="text-align:center">12:00</div>
+      <div class="axis-tick" style="text-align:center">15:30</div>
+      <div class="axis-tick" style="text-align:right">17:00+</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ 전략 스킬 ═══ -->
+<section>
+  <span class="section-tag">전략 스킬 시스템</span>
+  <h2>여러 전략을 갈아끼우며 최적화</h2>
+  <p class="section-desc">하나의 고정된 전략 대신, 여러 전략을 탑재해두고 시장 상황에 맞게 AI가 선택·조정합니다.</p>
+
+  <div class="skill-wrap">
+    <div class="skill-list">
+      <div class="skill-item">
+        <div class="skill-status active"></div>
+        <div class="skill-info">
+          <div class="skill-name">거래량 급등 전략</div>
+          <div class="skill-detail">평균 대비 거래량 2.5배 이상 시 진입</div>
+        </div>
+        <div class="skill-badge active">운용 중</div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-status active"></div>
+        <div class="skill-info">
+          <div class="skill-name">RSI 과매도 전략</div>
+          <div class="skill-detail">RSI 30 이하 진입 · 60 이상 청산</div>
+        </div>
+        <div class="skill-badge active">운용 중</div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-status experiment"></div>
+        <div class="skill-info">
+          <div class="skill-name">상승 돌파 전략</div>
+          <div class="skill-detail">52주 고점 돌파 시 소규모 진입 실험</div>
+        </div>
+        <div class="skill-badge experiment">실험 중</div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-status paused"></div>
+        <div class="skill-info">
+          <div class="skill-name">EMA 크로스 전략</div>
+          <div class="skill-detail">횡보장 연속 손실 → 일시 중단</div>
+        </div>
+        <div class="skill-badge paused">중단됨</div>
+      </div>
+      <div class="skill-item" style="border-style:dashed;opacity:0.5;">
+        <div class="skill-status" style="background:var(--text3);"></div>
+        <div class="skill-info">
+          <div class="skill-name">+ 새 전략 추가 가능</div>
+          <div class="skill-detail">파일 하나 추가하면 시스템에 편입</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="skill-explain">
+      <h3>AI는 어떻게 전략을 바꾸나요?</h3>
+      <div class="explain-step">
+        <div class="explain-num">1</div>
+        <div class="explain-text"><strong>성과 기록</strong><br>매일 17시, 어느 전략이 오늘 몇 번 거래해서 얼마의 수익을 냈는지 자동 기록합니다.</div>
+      </div>
+      <div class="explain-step">
+        <div class="explain-num">2</div>
+        <div class="explain-text"><strong>시장 국면 태깅</strong><br>오늘 시장이 추세장인지, 횡보장인지, 급등락 장인지 AI가 판단해 함께 저장합니다.</div>
+      </div>
+      <div class="explain-step">
+        <div class="explain-num">3</div>
+        <div class="explain-text"><strong>주간 검토</strong><br>매주 월요일, 4주간의 성과 데이터를 보고 AI가 "이 전략을 계속할지, 수치를 바꿀지, 잠시 쉴지" 결정합니다.</div>
+      </div>
+      <div class="explain-step">
+        <div class="explain-num">4</div>
+        <div class="explain-text"><strong>자동 반영</strong><br>결정이 내려지면 전략 파일이 자동으로 수정됩니다. 다음 번 신호 감지부터 바로 적용됩니다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ 폰 제어 ═══ -->
+<section>
+  <span class="section-tag">모바일 제어 (Dispatch)</span>
+  <h2>어디서든 폰으로 제어</h2>
+  <p class="section-desc">시스템은 서버에서 혼자 돌아갑니다. 사용자는 폰으로 현황을 확인하거나 필요할 때 명령을 내릴 수 있습니다.</p>
+
+  <div class="phone-wrap">
+    <div>
+      <div class="phone-mockup">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="chat-header">
+            <div class="chat-name">🤖 AI 거래 시스템</div>
+            <div class="chat-sub">● 운용 중</div>
+          </div>
+
+          <div class="chat-bubble me">
+            <div class="bubble-text">지금 어떤 전략 운용 중이야?</div>
+            <div class="bubble-time">오후 2:14</div>
+          </div>
+          <div class="chat-bubble ai">
+            <div class="bubble-text">현재 거래량 급등·RSI 전략 운용 중. 오늘 삼성전자 1건 매수, +1.8% 수익 중입니다.</div>
+            <div class="bubble-time">오후 2:14</div>
+          </div>
+
+          <div class="chat-bubble me">
+            <div class="bubble-text">EMA 전략 다시 켜줘</div>
+            <div class="bubble-time">오후 2:15</div>
+          </div>
+          <div class="chat-bubble ai">
+            <div class="bubble-text">EMA 크로스 전략을 실험 상태로 활성화했습니다. 소규모(10%)로 시작합니다.</div>
+            <div class="bubble-time">오후 2:15</div>
+          </div>
+
+          <div class="chat-bubble me">
+            <div class="bubble-text">오늘 전체 손익은?</div>
+            <div class="bubble-time">오후 3:22</div>
+          </div>
+          <div class="chat-bubble ai">
+            <div class="bubble-text">오늘 총 3건 거래. 실현손익 +24,500원, 평가손익 +18,200원입니다.</div>
+            <div class="bubble-time">오후 3:22</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone-features">
+      <div class="phone-feat">
+        <div class="feat-icon">📡</div>
+        <div>
+          <div class="feat-title">실시간 현황 조회</div>
+          <div class="feat-desc">어디서든 메시지 하나로 현재 운용 중인 전략, 보유 포지션, 오늘 손익을 확인할 수 있습니다.</div>
+        </div>
+      </div>
+      <div class="phone-feat">
+        <div class="feat-icon">🔀</div>
+        <div>
+          <div class="feat-title">전략 변경 명령</div>
+          <div class="feat-desc">특정 전략을 켜거나 끄거나, 손절선·목표 수익률 같은 수치를 조정하는 명령을 내릴 수 있습니다.</div>
+        </div>
+      </div>
+      <div class="phone-feat">
+        <div class="feat-icon">🛑</div>
+        <div>
+          <div class="feat-title">긴급 전체 청산</div>
+          <div class="feat-desc">갑작스러운 시장 급변 시 "모두 팔아줘" 한 마디로 보유 포지션 전체를 즉시 청산할 수 있습니다.</div>
+        </div>
+      </div>
+      <div class="phone-feat">
+        <div class="feat-icon">📊</div>
+        <div>
+          <div class="feat-title">성과 리포트 요청</div>
+          <div class="feat-desc">주간·월간 성과 요약, 전략별 승률 분석 리포트를 즉시 생성해 보내드립니다.</div>
+        </div>
+      </div>
+      <div class="note-box" style="margin-top:0;">
+        <span class="note-icon">📱</span>
+        <span>Claude의 <strong style="color:var(--text)">Dispatch</strong> 기능을 활용합니다. 폰이 리모컨, 데스크탑(또는 서버)이 실행 본체 역할을 합니다. 컴퓨터가 켜져 있는 한 언제 어디서나 제어 가능합니다.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ 구글 시트 공유 ═══ -->
+<section>
+  <span class="section-tag">데이터 공유</span>
+  <h2>거래 내역을 <span style="color:var(--teal)">구글 시트</span>로 투명하게 공유</h2>
+  <p class="section-desc">체결 내역, 보유 포지션, 전략 성과를 구글 시트에 자동으로 기록합니다. 링크만 있으면 누구나 실시간으로 확인할 수 있습니다.</p>
+
+  <div class="data-split">
+    <div class="data-col sheets">
+      <div class="data-col-title" style="color:var(--teal)">📊 구글 시트 (공유)</div>
+      <div class="data-col-sub">링크로 누구나 조회 가능</div>
+      <div class="data-item"><div class="data-dot dot-green"></div><div><div class="data-item-label">체결 내역</div><div class="data-item-desc">날짜·종목·수량·단가·손익</div></div></div>
+      <div class="data-item"><div class="data-dot dot-green"></div><div><div class="data-item-label">보유 포지션</div><div class="data-item-desc">현재 보유 종목·평균가·평가손익</div></div></div>
+      <div class="data-item"><div class="data-dot dot-green"></div><div><div class="data-item-label">전략별 성과</div><div class="data-item-desc">전략명·승률·누적 수익률</div></div></div>
+      <div class="data-item"><div class="data-dot dot-green"></div><div><div class="data-item-label">일일 리포트</div><div class="data-item-desc">날짜별 요약·시장 국면 태그</div></div></div>
+    </div>
+    <div class="data-col local">
+      <div class="data-col-title" style="color:var(--blue)">🗄️ 로컬 DB (빠른 처리)</div>
+      <div class="data-col-sub">대용량·고속·보안 데이터</div>
+      <div class="data-item"><div class="data-dot dot-blue"></div><div><div class="data-item-label">일봉 OHLCV</div><div class="data-item-desc">수년치 가격·거래량 원본</div></div></div>
+      <div class="data-item"><div class="data-dot dot-blue"></div><div><div class="data-item-label">기술 지표 계산값</div><div class="data-item-desc">RSI·EMA·거래량비율 등</div></div></div>
+      <div class="data-item"><div class="data-dot dot-blue"></div><div><div class="data-item-label">KIS 인증 토큰</div><div class="data-item-desc">보안상 외부 공개 불가</div></div></div>
+    </div>
+    <div class="data-col files">
+      <div class="data-col-title" style="color:var(--purple)">📁 로컬 파일</div>
+      <div class="data-col-sub">AI 전략 설정 파일</div>
+      <div class="data-item"><div class="data-dot dot-purple"></div><div><div class="data-item-label">전략 스킬 파일</div><div class="data-item-desc">파라미터·조건·허용 범위</div></div></div>
+      <div class="data-item"><div class="data-dot dot-purple"></div><div><div class="data-item-label">전략 메모</div><div class="data-item-desc">AI 판단 기록·변경 이유</div></div></div>
+      <div class="data-item"><div class="data-dot dot-purple"></div><div><div class="data-item-label">시스템 지시사항</div><div class="data-item-desc">CLAUDE.md 영구 설정</div></div></div>
+    </div>
+  </div>
+
+  <!-- 시트 미리보기 -->
+  <div class="sheets-mockup">
+    <div class="sheets-topbar">
+      <div class="sheets-title">📊 AI 거래 시스템 · 공유 시트</div>
+      <div class="sheets-link">🔗 링크로 공유</div>
+    </div>
+    <div class="sheets-tabs-row">
+      <div class="s-tab active">체결내역</div>
+      <div class="s-tab">보유포지션</div>
+      <div class="s-tab">전략성과</div>
+      <div class="s-tab">일일리포트</div>
+    </div>
+    <table class="sheets-tbl">
+      <thead>
+        <tr>
+          <th>체결일시</th><th>종목</th><th>전략</th><th>구분</th><th>수량</th><th>단가</th><th>손익</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>04/16 09:23</td><td>삼성전자</td><td><span class="stag stag-on">거래량급등</span></td><td>매수</td><td>10주</td><td>73,200원</td><td>—</td></tr>
+        <tr><td>04/16 11:47</td><td>SK하이닉스</td><td><span class="stag stag-on">RSI과매도</span></td><td>매수</td><td>5주</td><td>185,500원</td><td>—</td></tr>
+        <tr><td>04/16 14:02</td><td>삼성전자</td><td><span class="stag stag-on">거래량급등</span></td><td>매도</td><td>10주</td><td>74,800원</td><td class="cell-g">+16,000원</td></tr>
+        <tr><td>04/15 10:31</td><td>NAVER</td><td><span class="stag stag-off">EMA크로스</span></td><td>매도</td><td>3주</td><td>198,000원</td><td class="cell-r">-9,000원</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sync-note">
+    <span style="font-size:18px;flex-shrink:0">🔄</span>
+    <span>거래가 체결되는 즉시 <strong style="color:var(--teal)">Google Drive MCP</strong>를 통해 시트에 자동 기록됩니다. 시트 링크를 가진 사람이라면 별도 로그인 없이 실시간으로 현황을 조회할 수 있습니다.</span>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ 스킬 맵 ═══ -->
+<section>
+  <span class="section-tag">기술 구성</span>
+  <h2>시스템을 구성하는 스킬들</h2>
+  <p class="section-desc">각 기능은 독립적인 "스킬"로 분리되어 있어, 새 전략 추가나 기능 수정이 다른 부분에 영향을 주지 않습니다.</p>
+
+  <div class="sk-legend">
+    <div class="sk-leg"><div class="sk-leg-dot" style="background:var(--blue)"></div>MCP 서버 (외부 연동)</div>
+    <div class="sk-leg"><div class="sk-leg-dot" style="background:var(--teal)"></div>구글 시트 연동</div>
+    <div class="sk-leg"><div class="sk-leg-dot" style="background:var(--coral)"></div>신규 제작</div>
+    <div class="sk-leg"><div class="sk-leg-dot" style="background:var(--amber)"></div>기존 부분 활용</div>
+  </div>
+
+  <div class="sk-cat-title">외부 연동 (MCP 서버)</div>
+  <div class="skill-map-grid">
+    <div class="sk-card sk-mcp">
+      <div class="sk-top"><div class="sk-name">KIS MCP Server</div><div class="sk-badge sb-mcp">별도 구축</div></div>
+      <div class="sk-desc">현재가·주문·잔고 — KIS API 전체를 도구로 래핑</div>
+    </div>
+    <div class="sk-card sk-sheets">
+      <div class="sk-top"><div class="sk-name">Google Drive MCP</div><div class="sk-badge sb-exists">기존 연결됨</div></div>
+      <div class="sk-desc">체결내역·성과를 시트에 자동 기록·조회</div>
+    </div>
+  </div>
+
+  <div class="sk-cat-title">인프라 · 분석</div>
+  <div class="skill-map-grid">
+    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">db-manager</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">SQLite 로컬 DB 관리</div></div>
+    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">technical-indicators</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">RSI·EMA·거래량 비율 계산</div></div>
+    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">market-regime</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">추세·횡보·급등락 장 분류</div></div>
+    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">performance-analyzer</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">전략별 승률·수익률·MDD</div></div>
+  </div>
+
+  <div class="sk-cat-title">전략 스킬 (각각 독립)</div>
+  <div class="skill-map-grid">
+    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">strategy-vol-surge</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">거래량 급등 전략</div></div>
+    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">strategy-rsi</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">RSI 과매도 전략</div></div>
+    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">strategy-ema-cross</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">EMA 크로스 전략</div></div>
+    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">strategy-breakout</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">52주 고점 돌파 전략</div></div>
+  </div>
+
+  <div class="sk-cat-title">판단 · 오케스트레이션</div>
+  <div class="skill-map-grid">
+    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">risk-guard</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">주문 전 한도 검증 (필수 관문)</div></div>
+    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">strategy-meta-agent</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">주간 전략 선택·파라미터 튜닝</div></div>
+    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">recap-generator</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">일일 성과 리포트 생성 + 시트 기록</div></div>
+    <div class="sk-card sk-exists"><div class="sk-top"><div class="sk-name">file-reading</div><div class="sk-badge sb-exists">즉시 사용</div></div><div class="sk-desc">전략 YAML 스킬 파일 읽기</div></div>
+  </div>
+
+  <div class="sk-cat-title">출력</div>
+  <div class="skill-map-grid">
+    <div class="sk-card sk-partial"><div class="sk-top"><div class="sk-name">xlsx (기존)</div><div class="sk-badge sb-partial">부분 활용</div></div><div class="sk-desc">월간 거래 내역 엑셀 다운로드</div></div>
+    <div class="sk-card sk-partial"><div class="sk-top"><div class="sk-name">frontend-design (기존)</div><div class="sk-badge sb-partial">부분 활용</div></div><div class="sk-desc">성과 대시보드 UI 제작 시</div></div>
+  </div>
+
+  <div class="sk-summary">
+    <div class="sk-sum-item"><span class="sk-sum-num" style="color:var(--blue)">2</span><span class="sk-sum-lbl">MCP 서버</span></div>
+    <div class="sk-sum-item"><span class="sk-sum-num" style="color:var(--coral)">11</span><span class="sk-sum-lbl">신규 스킬</span></div>
+    <div class="sk-sum-item"><span class="sk-sum-num" style="color:var(--amber)">2</span><span class="sk-sum-lbl">부분 활용</span></div>
+    <div class="sk-sum-item"><span class="sk-sum-num" style="color:var(--teal)">1</span><span class="sk-sum-lbl">즉시 사용</span></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ 기대 효과 ═══ -->
+<section>
+  <span class="section-tag">기대 효과</span>
+  <h2>이 시스템이 만드는 변화</h2>
+  <p class="section-desc">자동화를 통해 얻을 수 있는 실질적인 이점들입니다.</p>
+
+  <div class="effect-grid">
+    <div class="effect-card">
+      <span class="effect-icon">⏱️</span>
+      <div class="effect-title">시간 해방</div>
+      <div class="effect-desc">차트를 매일 보지 않아도 됩니다. 시스템이 시장을 지켜보는 동안 다른 일을 할 수 있습니다.</div>
+    </div>
+    <div class="effect-card">
+      <span class="effect-icon">😤</span>
+      <div class="effect-title">감정 제거</div>
+      <div class="effect-desc">공포와 탐욕 없이 규칙대로만 거래합니다. 충동적인 매수·매도를 원천 차단합니다.</div>
+    </div>
+    <div class="effect-card">
+      <span class="effect-icon">📈</span>
+      <div class="effect-title">전략 진화</div>
+      <div class="effect-desc">시장이 바뀌면 전략도 바뀝니다. 과거 성과 데이터를 기반으로 AI가 지속적으로 개선합니다.</div>
+    </div>
+    <div class="effect-card">
+      <span class="effect-icon">🔬</span>
+      <div class="effect-title">다전략 실험</div>
+      <div class="effect-desc">여러 전략을 동시에 소규모로 실험해 성과가 좋은 것을 자동으로 확대 적용합니다.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<div class="footer">
+  <p>AI 자동 주식 거래 시스템 구상안 · Claude Code + KIS MCP + Google Sheets 기반</p>
+  <p style="margin-top:6px;font-size:11px;">본 자료는 시스템 구조 설명을 위한 기획안입니다. 실제 투자는 개인의 판단과 책임 하에 이루어져야 합니다.</p>
+</div>
+
+</body>
+</html>

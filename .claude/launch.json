@@ -1,0 +1,22 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ai-trading-explainer",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", ".", "--listen", "3002", "--no-clipboard"],
+      "cwd": ".",
+      "port": 3002
+    },
+    {
+      "name": "kis-trading-mcp",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": ["run", "server.py"],
+      "cwd": "MCP/Kis Trading MCP",
+      "env": {
+        "ENV": "paper"
+      },
+      "port": 8000
+    }
+  ]
+}
