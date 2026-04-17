@@ -597,7 +597,10 @@
   .sk-card.sk-exists::before  { background: var(--teal); }
   .sk-card.sk-sheets  { border-color: rgba(16,217,160,0.4); background: rgba(16,217,160,0.05); }
   .sk-card.sk-sheets::before  { background: var(--teal); }
-  .sk-card.sk-dim { opacity: 0.4; }
+  .sk-card.sk-dim  { opacity: 0.4; }
+  .sk-card.sk-done { border-color: rgba(16,217,160,0.25); }
+  .sk-card.sk-done::before { background: var(--teal); }
+  .sb-done { background: rgba(16,217,160,0.15); color: var(--teal); }
 
   .sk-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; margin-bottom: 5px; }
   .sk-name { font-size: 12px; font-weight: 600; }
@@ -709,17 +712,17 @@
 <div class="hero">
   <div class="hero-badge">
     <span class="badge-dot"></span>
-    자동 운용 시스템 구상안
+    모의투자 운용 중 · KIS 실전 연동 완료
   </div>
-  <h1>AI가 <span class="accent">24시간</span><br>주식을 대신 거래합니다</h1>
+  <h1>AI가 <span class="accent">스스로</span><br>주식을 거래합니다</h1>
   <p class="hero-sub">사람이 직접 차트를 보지 않아도, AI가 시장을 분석하고 전략을 선택하고 주문을 실행합니다. 결과를 바탕으로 스스로 전략을 개선합니다.</p>
   <div class="hero-stats">
     <div class="stat">
-      <span class="stat-num">24/7</span>
-      <span class="stat-label">무중단 모니터링</span>
+      <span class="stat-num">3개</span>
+      <span class="stat-label">자동 루틴</span>
     </div>
     <div class="stat">
-      <span class="stat-num">5분</span>
+      <span class="stat-num">15분</span>
       <span class="stat-label">신호 감지 주기</span>
     </div>
     <div class="stat">
@@ -801,33 +804,27 @@
 <!-- ═══ 4가지 루틴 ═══ -->
 <section>
   <span class="section-tag">자동화 구조</span>
-  <h2>4가지 자동 루틴</h2>
-  <p class="section-desc">시스템은 4개의 자동 작업이 시간대별로 맞물려 돌아갑니다. 모두 사람의 개입 없이 실행됩니다.</p>
+  <h2>3가지 자동 루틴</h2>
+  <p class="section-desc">시스템은 3개의 Claude Code Scheduled Task가 시간대별로 맞물려 돌아갑니다. 모두 사람의 개입 없이 실행됩니다.</p>
 
   <div class="routine-grid">
     <div class="routine-card c1">
-      <div class="routine-num">루틴 1</div>
-      <div class="routine-name">데이터 수집</div>
-      <div class="routine-time">⏰ 매일 장 마감 후 16:30</div>
-      <div class="routine-desc">오늘 주가와 거래량 데이터를 가져와 저장합니다. 내일 분석의 재료가 됩니다.</div>
+      <div class="routine-num">루틴 1 · kis-data-collect</div>
+      <div class="routine-name">캐시 워밍</div>
+      <div class="routine-time">⏰ 평일 08:00 (장 시작 1시간 전)</div>
+      <div class="routine-desc">OHLCV·후보 종목 데이터를 미리 가져와 캐시합니다. 09:00 장 시작 즉시 캐시 히트로 빠르게 첫 사이클을 돌립니다.</div>
     </div>
     <div class="routine-card c2">
-      <div class="routine-num">루틴 2</div>
-      <div class="routine-name">매매 트리거</div>
-      <div class="routine-time">⏰ 장중 5분마다 (09:00~15:25)</div>
-      <div class="routine-desc">주식 시장이 열려 있는 동안 5분마다 신호를 확인하고, 조건이 맞으면 주문을 냅니다.</div>
+      <div class="routine-num">루틴 2 · kis-trading-cycle</div>
+      <div class="routine-name">장중 매매</div>
+      <div class="routine-time">⏰ 평일 09:00~15:00, 15분마다</div>
+      <div class="routine-desc">RSI·MACD 신호를 확인하고, 조건이 맞으면 KIS 모의투자 API로 즉시 주문을 실행합니다. 결과는 Notion에 실시간 기록됩니다.</div>
     </div>
     <div class="routine-card c3">
-      <div class="routine-num">루틴 3</div>
-      <div class="routine-name">일일 성과 분석</div>
-      <div class="routine-time">⏰ 매일 17:00</div>
-      <div class="routine-desc">오늘 거래 결과를 전략별로 분석합니다. 어떤 전략이 효과 있었는지 기록합니다.</div>
-    </div>
-    <div class="routine-card c4">
-      <div class="routine-num">루틴 4</div>
-      <div class="routine-name">전략 진화</div>
-      <div class="routine-time">⏰ 매주 월요일 08:30</div>
-      <div class="routine-desc">4주간 성과를 검토해 부진한 전략을 교체하거나 수치를 조정합니다. AI가 스스로 판단합니다.</div>
+      <div class="routine-num">루틴 3 · kis-daily-recap</div>
+      <div class="routine-name">복기 + 전략 진화</div>
+      <div class="routine-time">⏰ 평일 15:35 (장 마감 5분 후)</div>
+      <div class="routine-desc">오늘 성과를 분석하고 AI가 전략 파라미터를 자동 조정합니다. 복기 결과는 Notion 전략 히스토리 DB에 자동 기록됩니다.</div>
     </div>
   </div>
 
@@ -835,34 +832,29 @@
   <div class="timeline-wrap" style="margin-top:24px;">
     <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:20px;">하루 타임라인</div>
     <div class="timeline-row">
-      <div class="timeline-label">루틴 2<br><span style="color:var(--text3);font-size:10px;">매매 트리거</span></div>
+      <div class="timeline-label">루틴 1<br><span style="color:var(--text3);font-size:10px;">캐시 워밍</span></div>
       <div class="timeline-bar-wrap">
-        <div class="timeline-bar t-teal" style="left:0%;width:73%;">5분마다 신호 감지 · 주문 실행</div>
+        <div class="timeline-bar t-blue" style="left:0%;width:12%;">08:00 캐시 준비</div>
       </div>
     </div>
     <div class="timeline-row">
-      <div class="timeline-label">루틴 1<br><span style="color:var(--text3);font-size:10px;">데이터 수집</span></div>
+      <div class="timeline-label">루틴 2<br><span style="color:var(--text3);font-size:10px;">장중 매매</span></div>
       <div class="timeline-bar-wrap">
-        <div class="timeline-bar t-blue" style="left:76%;width:14%;">일봉 수집</div>
+        <div class="timeline-bar t-teal" style="left:12%;width:65%;">15분마다 신호 감지 · 주문 실행</div>
       </div>
     </div>
     <div class="timeline-row">
-      <div class="timeline-label">루틴 3<br><span style="color:var(--text3);font-size:10px;">성과 분석</span></div>
+      <div class="timeline-label">루틴 3<br><span style="color:var(--text3);font-size:10px;">복기·진화</span></div>
       <div class="timeline-bar-wrap">
-        <div class="timeline-bar t-coral" style="left:89%;width:11%;">분석</div>
-      </div>
-    </div>
-    <div class="timeline-row">
-      <div class="timeline-label">루틴 4<br><span style="color:var(--text3);font-size:10px;">전략 진화</span></div>
-      <div class="timeline-bar-wrap">
-        <div class="timeline-bar t-purple" style="left:0%;width:10%;">월요일만</div>
+        <div class="timeline-bar t-coral" style="left:80%;width:20%;">15:35 복기 + Notion 기록</div>
       </div>
     </div>
     <div class="timeline-axis">
-      <div class="axis-tick">09:00</div>
+      <div class="axis-tick">08:00</div>
+      <div class="axis-tick" style="text-align:center">09:00</div>
       <div class="axis-tick" style="text-align:center">12:00</div>
-      <div class="axis-tick" style="text-align:center">15:30</div>
-      <div class="axis-tick" style="text-align:right">17:00+</div>
+      <div class="axis-tick" style="text-align:center">15:00</div>
+      <div class="axis-tick" style="text-align:right">15:35</div>
     </div>
   </div>
 </section>
@@ -871,50 +863,43 @@
 
 <!-- ═══ 전략 스킬 ═══ -->
 <section>
-  <span class="section-tag">전략 스킬 시스템</span>
-  <h2>여러 전략을 갈아끼우며 최적화</h2>
-  <p class="section-desc">하나의 고정된 전략 대신, 여러 전략을 탑재해두고 시장 상황에 맞게 AI가 선택·조정합니다.</p>
+  <span class="section-tag">현재 전략</span>
+  <h2>전략 파라미터를 AI가 직접 수정</h2>
+  <p class="section-desc">전략은 <code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">strategy/config.json</code> 파일 하나로 관리됩니다. 매일 15:35 복기 후 AI가 수익률 기준으로 파라미터를 자동 조정합니다.</p>
 
   <div class="skill-wrap">
     <div class="skill-list">
       <div class="skill-item">
         <div class="skill-status active"></div>
         <div class="skill-info">
-          <div class="skill-name">거래량 급등 전략</div>
-          <div class="skill-detail">평균 대비 거래량 2.5배 이상 시 진입</div>
+          <div class="skill-name">RSI 과매도 반등 + MACD 골든크로스</div>
+          <div class="skill-detail">v1 · 운용 모드: RSI &lt; 35 AND MACD 상향전환</div>
         </div>
         <div class="skill-badge active">운용 중</div>
       </div>
-      <div class="skill-item">
-        <div class="skill-status active"></div>
-        <div class="skill-info">
-          <div class="skill-name">RSI 과매도 전략</div>
-          <div class="skill-detail">RSI 30 이하 진입 · 60 이상 청산</div>
-        </div>
-        <div class="skill-badge active">운용 중</div>
-      </div>
-      <div class="skill-item">
+      <div class="skill-item" style="border-color:rgba(251,191,36,0.4);background:rgba(251,191,36,0.05);">
         <div class="skill-status experiment"></div>
         <div class="skill-info">
-          <div class="skill-name">상승 돌파 전략</div>
-          <div class="skill-detail">52주 고점 돌파 시 소규모 진입 실험</div>
+          <div class="skill-name">테스트 모드 (test_mode: true)</div>
+          <div class="skill-detail">RSI &lt; 60 단일 조건 · 익절 +2% / 손절 -2%</div>
         </div>
-        <div class="skill-badge experiment">실험 중</div>
-      </div>
-      <div class="skill-item">
-        <div class="skill-status paused"></div>
-        <div class="skill-info">
-          <div class="skill-name">EMA 크로스 전략</div>
-          <div class="skill-detail">횡보장 연속 손실 → 일시 중단</div>
-        </div>
-        <div class="skill-badge paused">중단됨</div>
+        <div class="skill-badge experiment">테스트 중</div>
       </div>
       <div class="skill-item" style="border-style:dashed;opacity:0.5;">
         <div class="skill-status" style="background:var(--text3);"></div>
         <div class="skill-info">
-          <div class="skill-name">+ 새 전략 추가 가능</div>
-          <div class="skill-detail">파일 하나 추가하면 시스템에 편입</div>
+          <div class="skill-name">거래량 급등 전략</div>
+          <div class="skill-detail">평균 대비 거래량 2.5배 이상 시 진입 — 구현 예정</div>
         </div>
+        <div class="skill-badge paused">예정</div>
+      </div>
+      <div class="skill-item" style="border-style:dashed;opacity:0.5;">
+        <div class="skill-status" style="background:var(--text3);"></div>
+        <div class="skill-info">
+          <div class="skill-name">시장 국면 분류 (market_regime)</div>
+          <div class="skill-detail">추세·횡보·급등락 장 분류 — 구현 예정</div>
+        </div>
+        <div class="skill-badge paused">예정</div>
       </div>
     </div>
 
@@ -922,19 +907,19 @@
       <h3>AI는 어떻게 전략을 바꾸나요?</h3>
       <div class="explain-step">
         <div class="explain-num">1</div>
-        <div class="explain-text"><strong>성과 기록</strong><br>매일 17시, 어느 전략이 오늘 몇 번 거래해서 얼마의 수익을 냈는지 자동 기록합니다.</div>
+        <div class="explain-text"><strong>복기 (15:35)</strong><br>오늘 주문 수·승률·손익비·MDD를 자동 계산해 <code>performance.json</code>에 기록합니다.</div>
       </div>
       <div class="explain-step">
         <div class="explain-num">2</div>
-        <div class="explain-text"><strong>시장 국면 태깅</strong><br>오늘 시장이 추세장인지, 횡보장인지, 급등락 장인지 AI가 판단해 함께 저장합니다.</div>
+        <div class="explain-text"><strong>AI 피드백 생성</strong><br>기대수익이 낮으면 진입 조건 강화, 손익비가 낮으면 익절 목표 상향 등 규칙 기반으로 개선안을 도출합니다.</div>
       </div>
       <div class="explain-step">
         <div class="explain-num">3</div>
-        <div class="explain-text"><strong>주간 검토</strong><br>매주 월요일, 4주간의 성과 데이터를 보고 AI가 "이 전략을 계속할지, 수치를 바꿀지, 잠시 쉴지" 결정합니다.</div>
+        <div class="explain-text"><strong>config.json 자동 수정</strong><br>RSI 임계값·익절·손절 수치를 파일에 직접 수정합니다. 다음 사이클부터 즉시 적용됩니다.</div>
       </div>
       <div class="explain-step">
         <div class="explain-num">4</div>
-        <div class="explain-text"><strong>자동 반영</strong><br>결정이 내려지면 전략 파일이 자동으로 수정됩니다. 다음 번 신호 감지부터 바로 적용됩니다.</div>
+        <div class="explain-text"><strong>Notion 기록</strong><br>변경 전/후 파라미터 비교·AI 피드백 내용이 Notion 전략 히스토리 DB에 자동 추가됩니다.</div>
       </div>
     </div>
   </div>
@@ -1027,67 +1012,111 @@
 
 <div class="divider"></div>
 
-<!-- ═══ 구글 시트 공유 ═══ -->
+<!-- ═══ Notion 대시보드 ═══ -->
 <section>
   <span class="section-tag">데이터 공유</span>
-  <h2>거래 내역을 <span style="color:var(--teal)">구글 시트</span>로 투명하게 공유</h2>
-  <p class="section-desc">체결 내역, 보유 포지션, 전략 성과를 구글 시트에 자동으로 기록합니다. 링크만 있으면 누구나 실시간으로 확인할 수 있습니다.</p>
+  <h2>전략 히스토리를 <span style="color:var(--teal)">Notion으로</span> 투명하게 관리</h2>
+  <p class="section-desc">매일 장 마감 후, 전략 파라미터 변경 이력과 성과가 Notion에 자동 기록됩니다.</p>
 
   <div class="data-split">
     <div class="data-col sheets">
-      <div class="data-col-title" style="color:var(--teal)">📊 구글 시트 (공유)</div>
-      <div class="data-col-sub">링크로 누구나 조회 가능</div>
-      <div class="data-item"><div class="data-dot dot-green"></div><div><div class="data-item-label">체결 내역</div><div class="data-item-desc">날짜·종목·수량·단가·손익</div></div></div>
-      <div class="data-item"><div class="data-dot dot-green"></div><div><div class="data-item-label">보유 포지션</div><div class="data-item-desc">현재 보유 종목·평균가·평가손익</div></div></div>
-      <div class="data-item"><div class="data-dot dot-green"></div><div><div class="data-item-label">전략별 성과</div><div class="data-item-desc">전략명·승률·누적 수익률</div></div></div>
-      <div class="data-item"><div class="data-dot dot-green"></div><div><div class="data-item-label">일일 리포트</div><div class="data-item-desc">날짜별 요약·시장 국면 태그</div></div></div>
+      <div class="data-col-title" style="color:var(--teal)">📓 Notion (전략 히스토리)</div>
+      <div class="data-col-sub">매일 15:35 자동 기록</div>
+      <div class="data-item"><div class="data-dot dot-green"></div><div><div class="data-item-label">체결내역</div><div class="data-item-desc">시간·종목·구분·수량·손익·전략</div></div></div>
+      <div class="data-item"><div class="data-dot dot-green"></div><div><div class="data-item-label">보유포지션</div><div class="data-item-desc">보유 종목·수량·평균단가·평가손익</div></div></div>
+      <div class="data-item"><div class="data-dot dot-green"></div><div><div class="data-item-label">전략성과</div><div class="data-item-desc">승률·손익비·MDD·AI 피드백 이력</div></div></div>
+      <div class="data-item"><div class="data-dot dot-green"></div><div><div class="data-item-label">일일리포트</div><div class="data-item-desc">당일 요약·전략 파라미터 변경 내역</div></div></div>
     </div>
     <div class="data-col local">
-      <div class="data-col-title" style="color:var(--blue)">🗄️ 로컬 DB (빠른 처리)</div>
-      <div class="data-col-sub">대용량·고속·보안 데이터</div>
-      <div class="data-item"><div class="data-dot dot-blue"></div><div><div class="data-item-label">일봉 OHLCV</div><div class="data-item-desc">수년치 가격·거래량 원본</div></div></div>
-      <div class="data-item"><div class="data-dot dot-blue"></div><div><div class="data-item-label">기술 지표 계산값</div><div class="data-item-desc">RSI·EMA·거래량비율 등</div></div></div>
-      <div class="data-item"><div class="data-dot dot-blue"></div><div><div class="data-item-label">KIS 인증 토큰</div><div class="data-item-desc">보안상 외부 공개 불가</div></div></div>
+      <div class="data-col-title" style="color:var(--blue)">🗄️ 로컬 SQLite</div>
+      <div class="data-col-sub">빠른 처리·대용량 저장</div>
+      <div class="data-item"><div class="data-dot dot-blue"></div><div><div class="data-item-label">주문 이력</div><div class="data-item-desc">orders.db (전체 이력)</div></div></div>
+      <div class="data-item"><div class="data-dot dot-blue"></div><div><div class="data-item-label">일봉 OHLCV 캐시</div><div class="data-item-desc">TTL 기반 파일 캐시</div></div></div>
+      <div class="data-item"><div class="data-dot dot-blue"></div><div><div class="data-item-label">기술 지표 계산값</div><div class="data-item-desc">RSI·MACD·EMA 등</div></div></div>
     </div>
     <div class="data-col files">
       <div class="data-col-title" style="color:var(--purple)">📁 로컬 파일</div>
       <div class="data-col-sub">AI 전략 설정 파일</div>
-      <div class="data-item"><div class="data-dot dot-purple"></div><div><div class="data-item-label">전략 스킬 파일</div><div class="data-item-desc">파라미터·조건·허용 범위</div></div></div>
-      <div class="data-item"><div class="data-dot dot-purple"></div><div><div class="data-item-label">전략 메모</div><div class="data-item-desc">AI 판단 기록·변경 이유</div></div></div>
-      <div class="data-item"><div class="data-dot dot-purple"></div><div><div class="data-item-label">시스템 지시사항</div><div class="data-item-desc">CLAUDE.md 영구 설정</div></div></div>
+      <div class="data-item"><div class="data-dot dot-purple"></div><div><div class="data-item-label">strategy/config.json</div><div class="data-item-desc">전략 파라미터 (AI가 수정)</div></div></div>
+      <div class="data-item"><div class="data-dot dot-purple"></div><div><div class="data-item-label">feedback_log.json</div><div class="data-item-desc">AI 피드백 이력</div></div></div>
+      <div class="data-item"><div class="data-dot dot-purple"></div><div><div class="data-item-label">CLAUDE.md</div><div class="data-item-desc">시스템 단일 진실의 소스</div></div></div>
     </div>
   </div>
 
-  <!-- 시트 미리보기 -->
+  <!-- Notion 미리보기 -->
   <div class="sheets-mockup">
     <div class="sheets-topbar">
-      <div class="sheets-title">📊 AI 거래 시스템 · 공유 시트</div>
-      <div class="sheets-link">🔗 링크로 공유</div>
+      <div class="sheets-title">📊 AI 주식 트레이딩 · 전략 히스토리</div>
     </div>
     <div class="sheets-tabs-row">
-      <div class="s-tab active">체결내역</div>
-      <div class="s-tab">보유포지션</div>
-      <div class="s-tab">전략성과</div>
-      <div class="s-tab">일일리포트</div>
+      <div class="s-tab active">📅 날짜별</div>
+      <div class="s-tab">🔄 상태별</div>
     </div>
     <table class="sheets-tbl">
       <thead>
         <tr>
-          <th>체결일시</th><th>종목</th><th>전략</th><th>구분</th><th>수량</th><th>단가</th><th>손익</th>
+          <th>날짜</th><th>버전</th><th>상태</th><th>총주문</th><th>RSI기준</th><th>손절%</th><th>AI피드백</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td>04/16 09:23</td><td>삼성전자</td><td><span class="stag stag-on">거래량급등</span></td><td>매수</td><td>10주</td><td>73,200원</td><td>—</td></tr>
-        <tr><td>04/16 11:47</td><td>SK하이닉스</td><td><span class="stag stag-on">RSI과매도</span></td><td>매수</td><td>5주</td><td>185,500원</td><td>—</td></tr>
-        <tr><td>04/16 14:02</td><td>삼성전자</td><td><span class="stag stag-on">거래량급등</span></td><td>매도</td><td>10주</td><td>74,800원</td><td class="cell-g">+16,000원</td></tr>
-        <tr><td>04/15 10:31</td><td>NAVER</td><td><span class="stag stag-off">EMA크로스</span></td><td>매도</td><td>3주</td><td>198,000원</td><td class="cell-r">-9,000원</td></tr>
+        <tr>
+          <td>2026-04-16</td><td>v1</td>
+          <td><span class="stag stag-on">🟢 파라미터유지</span></td>
+          <td>0건</td><td>35</td><td>-3.0%</td><td>전략 변경 없음</td>
+        </tr>
+        <tr>
+          <td>2026-04-15</td><td>v2</td>
+          <td><span class="stag stag-amber">🟡 파라미터수정</span></td>
+          <td>4건</td><td>32</td><td>-2.0%</td><td>승률 33% → RSI 강화</td>
+        </tr>
       </tbody>
     </table>
   </div>
 
   <div class="sync-note">
     <span style="font-size:18px;flex-shrink:0">🔄</span>
-    <span>거래가 체결되는 즉시 <strong style="color:var(--teal)">Google Drive MCP</strong>를 통해 시트에 자동 기록됩니다. 시트 링크를 가진 사람이라면 별도 로그인 없이 실시간으로 현황을 조회할 수 있습니다.</span>
+    <span>매일 15:35 장 마감 직후 자동 기록됩니다. 행을 클릭하면 그날의 전략 파라미터 전체와 AI 피드백 상세 내용을 확인할 수 있습니다.</span>
+  </div>
+  <div class="note-box" style="margin-top:16px;">
+    <span class="note-icon">⚡</span>
+    <span><strong style="color:var(--text)">체결내역은 주문 즉시 기록됩니다.</strong> 루틴 2(장중 매매)에서 주문이 성공하면 <code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">notion_reporter.py</code>가 Notion 체결내역 페이지에 실시간으로 행을 추가합니다. 15:35를 기다릴 필요 없이 거래 직후 확인 가능합니다.</span>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ 대시보드 카드 ═══ -->
+<section>
+  <span class="section-tag">실시간 대시보드</span>
+  <h2>운용 현황을 <span style="color:var(--teal)">한눈에</span> 추적</h2>
+  <p class="section-desc">거래 체결부터 전략 성과까지, 4개의 전용 Notion 페이지에서 실시간으로 확인합니다.</p>
+
+  <div class="concept-grid">
+    <div class="concept-card" style="--accent-color: var(--teal)">
+      <span class="concept-icon">📋</span>
+      <h3>체결내역</h3>
+      <p>실행된 모든 주문 이력. 종목·가격·수량·손익·전략 태그를 날짜별로 기록합니다.</p>
+    </div>
+    <div class="concept-card" style="--accent-color: var(--blue)">
+      <span class="concept-icon">💼</span>
+      <h3>보유포지션</h3>
+      <p>현재 보유 중인 종목의 매수가·현재가·평가손익을 실시간으로 추적합니다.</p>
+    </div>
+    <div class="concept-card" style="--accent-color: var(--purple)">
+      <span class="concept-icon">📈</span>
+      <h3>전략성과</h3>
+      <p>승률·손익비·MDD 등 누적 성과 메트릭. AI 피드백 히스토리를 한 페이지에서 확인합니다.</p>
+    </div>
+    <div class="concept-card" style="--accent-color: var(--coral)">
+      <span class="concept-icon">📅</span>
+      <h3>일일리포트</h3>
+      <p>매일 15:35 장 마감 후 자동 업데이트. 당일 매매 현황·AI 피드백·파라미터 변경을 요약합니다.</p>
+    </div>
+  </div>
+
+  <div class="sync-note">
+    <span style="font-size:18px;flex-shrink:0">📓</span>
+    <span>모든 대시보드는 <strong style="color:var(--text)">Notion</strong>에서 관리됩니다. 매일 15:35 <code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">run_review.py</code> 실행 후 자동 업데이트됩니다.</span>
   </div>
 </section>
 
@@ -1096,63 +1125,56 @@
 <!-- ═══ 스킬 맵 ═══ -->
 <section>
   <span class="section-tag">기술 구성</span>
-  <h2>시스템을 구성하는 스킬들</h2>
-  <p class="section-desc">각 기능은 독립적인 "스킬"로 분리되어 있어, 새 전략 추가나 기능 수정이 다른 부분에 영향을 주지 않습니다.</p>
+  <h2>시스템을 구성하는 컴포넌트들</h2>
+  <p class="section-desc">각 기능은 독립적인 스크립트로 분리되어 있어, 새 전략 추가나 기능 수정이 다른 부분에 영향을 주지 않습니다.</p>
 
   <div class="sk-legend">
-    <div class="sk-leg"><div class="sk-leg-dot" style="background:var(--blue)"></div>MCP 서버 (외부 연동)</div>
-    <div class="sk-leg"><div class="sk-leg-dot" style="background:var(--teal)"></div>구글 시트 연동</div>
-    <div class="sk-leg"><div class="sk-leg-dot" style="background:var(--coral)"></div>신규 제작</div>
-    <div class="sk-leg"><div class="sk-leg-dot" style="background:var(--amber)"></div>기존 부분 활용</div>
+    <div class="sk-leg"><div class="sk-leg-dot" style="background:var(--teal)"></div>연결됨</div>
+    <div class="sk-leg"><div class="sk-leg-dot" style="background:var(--green)"></div>구현완료</div>
+    <div class="sk-leg"><div class="sk-leg-dot" style="background:var(--amber)"></div>예정</div>
   </div>
 
-  <div class="sk-cat-title">외부 연동 (MCP 서버)</div>
+  <div class="sk-cat-title">외부 연동</div>
   <div class="skill-map-grid">
-    <div class="sk-card sk-mcp">
-      <div class="sk-top"><div class="sk-name">KIS MCP Server</div><div class="sk-badge sb-mcp">별도 구축</div></div>
-      <div class="sk-desc">현재가·주문·잔고 — KIS API 전체를 도구로 래핑</div>
+    <div class="sk-card sk-sheets">
+      <div class="sk-top"><div class="sk-name">KIS REST API (모의투자)</div><div class="sk-badge sb-sheets">✅ 연결됨</div></div>
+      <div class="sk-desc">현재가·주문·잔고·일봉 직접 호출</div>
     </div>
     <div class="sk-card sk-sheets">
-      <div class="sk-top"><div class="sk-name">Google Drive MCP</div><div class="sk-badge sb-exists">기존 연결됨</div></div>
-      <div class="sk-desc">체결내역·성과를 시트에 자동 기록·조회</div>
+      <div class="sk-top"><div class="sk-name">Notion</div><div class="sk-badge sb-sheets">✅ 연결됨</div></div>
+      <div class="sk-desc">전략 히스토리 + 대시보드 자동 기록</div>
+    </div>
+    <div class="sk-card sk-partial">
+      <div class="sk-top"><div class="sk-name">KIS REST API (실전)</div><div class="sk-badge sb-partial">⏳ 예정</div></div>
+      <div class="sk-desc">실전 앱키 설정 시 거래량순위 활성화</div>
     </div>
   </div>
 
-  <div class="sk-cat-title">인프라 · 분석</div>
+  <div class="sk-cat-title">구현된 스크립트</div>
   <div class="skill-map-grid">
-    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">db-manager</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">SQLite 로컬 DB 관리</div></div>
-    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">technical-indicators</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">RSI·EMA·거래량 비율 계산</div></div>
-    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">market-regime</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">추세·횡보·급등락 장 분류</div></div>
-    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">performance-analyzer</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">전략별 승률·수익률·MDD</div></div>
+    <div class="sk-card sk-done"><div class="sk-top"><div class="sk-name">run_cycle.py</div><div class="sk-badge sb-done">✅</div></div><div class="sk-desc">장중 매매 사이클 메인</div></div>
+    <div class="sk-card sk-done"><div class="sk-top"><div class="sk-name">run_review.py</div><div class="sk-badge sb-done">✅</div></div><div class="sk-desc">일일 성과 분석 + 전략 진화 + Notion 업데이트</div></div>
+    <div class="sk-card sk-done"><div class="sk-top"><div class="sk-name">kis_helper.py</div><div class="sk-badge sb-done">✅</div></div><div class="sk-desc">KIS API 인증·현재가·주문·잔고·일봉</div></div>
+    <div class="sk-card sk-done"><div class="sk-top"><div class="sk-name">cache_manager.py</div><div class="sk-badge sb-done">✅</div></div><div class="sk-desc">파일 캐시 읽기/쓰기 (TTL 기반)</div></div>
+    <div class="sk-card sk-done"><div class="sk-top"><div class="sk-name">indicators.py</div><div class="sk-badge sb-done">✅</div></div><div class="sk-desc">RSI·MACD·EMA·볼린저밴드 계산</div></div>
+    <div class="sk-card sk-done"><div class="sk-top"><div class="sk-name">signals.py</div><div class="sk-badge sb-done">✅</div></div><div class="sk-desc">config.json 기반 매수/매도/홀드 신호 판단</div></div>
+    <div class="sk-card sk-done"><div class="sk-top"><div class="sk-name">executor.py</div><div class="sk-badge sb-done">✅</div></div><div class="sk-desc">주문 실행 + orders.db 저장 + Notion 즉시 기록</div></div>
+    <div class="sk-card sk-done"><div class="sk-top"><div class="sk-name">analyzer.py</div><div class="sk-badge sb-done">✅</div></div><div class="sk-desc">성과 분석 + AI 피드백 + config.json 자동 수정</div></div>
+    <div class="sk-card sk-done"><div class="sk-top"><div class="sk-name">notion_reporter.py</div><div class="sk-badge sb-done">✅</div></div><div class="sk-desc">체결내역 즉시 기록 + 전략 히스토리 DB 자동 push</div></div>
   </div>
 
-  <div class="sk-cat-title">전략 스킬 (각각 독립)</div>
+  <div class="sk-cat-title">예정 스크립트</div>
   <div class="skill-map-grid">
-    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">strategy-vol-surge</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">거래량 급등 전략</div></div>
-    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">strategy-rsi</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">RSI 과매도 전략</div></div>
-    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">strategy-ema-cross</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">EMA 크로스 전략</div></div>
-    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">strategy-breakout</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">52주 고점 돌파 전략</div></div>
-  </div>
-
-  <div class="sk-cat-title">판단 · 오케스트레이션</div>
-  <div class="skill-map-grid">
-    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">risk-guard</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">주문 전 한도 검증 (필수 관문)</div></div>
-    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">strategy-meta-agent</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">주간 전략 선택·파라미터 튜닝</div></div>
-    <div class="sk-card sk-new"><div class="sk-top"><div class="sk-name">recap-generator</div><div class="sk-badge sb-new">신규</div></div><div class="sk-desc">일일 성과 리포트 생성 + 시트 기록</div></div>
-    <div class="sk-card sk-exists"><div class="sk-top"><div class="sk-name">file-reading</div><div class="sk-badge sb-exists">즉시 사용</div></div><div class="sk-desc">전략 YAML 스킬 파일 읽기</div></div>
-  </div>
-
-  <div class="sk-cat-title">출력</div>
-  <div class="skill-map-grid">
-    <div class="sk-card sk-partial"><div class="sk-top"><div class="sk-name">xlsx (기존)</div><div class="sk-badge sb-partial">부분 활용</div></div><div class="sk-desc">월간 거래 내역 엑셀 다운로드</div></div>
-    <div class="sk-card sk-partial"><div class="sk-top"><div class="sk-name">frontend-design (기존)</div><div class="sk-badge sb-partial">부분 활용</div></div><div class="sk-desc">성과 대시보드 UI 제작 시</div></div>
+    <div class="sk-card sk-partial"><div class="sk-top"><div class="sk-name">market_regime.py</div><div class="sk-badge sb-partial">예정</div></div><div class="sk-desc">추세·횡보·급등락 장 분류</div></div>
+    <div class="sk-card sk-partial"><div class="sk-top"><div class="sk-name">risk_guard.py</div><div class="sk-badge sb-partial">예정</div></div><div class="sk-desc">주문 전 한도 검증 (필수 관문)</div></div>
+    <div class="sk-card sk-partial"><div class="sk-top"><div class="sk-name">strategy_vol_surge.py</div><div class="sk-badge sb-partial">예정</div></div><div class="sk-desc">거래량 급등 전략 추가</div></div>
   </div>
 
   <div class="sk-summary">
-    <div class="sk-sum-item"><span class="sk-sum-num" style="color:var(--blue)">2</span><span class="sk-sum-lbl">MCP 서버</span></div>
-    <div class="sk-sum-item"><span class="sk-sum-num" style="color:var(--coral)">11</span><span class="sk-sum-lbl">신규 스킬</span></div>
-    <div class="sk-sum-item"><span class="sk-sum-num" style="color:var(--amber)">2</span><span class="sk-sum-lbl">부분 활용</span></div>
-    <div class="sk-sum-item"><span class="sk-sum-num" style="color:var(--teal)">1</span><span class="sk-sum-lbl">즉시 사용</span></div>
+    <div class="sk-sum-item"><span class="sk-sum-num" style="color:var(--green)">9</span><span class="sk-sum-lbl">구현완료</span></div>
+    <div class="sk-sum-item"><span class="sk-sum-num" style="color:var(--amber)">3</span><span class="sk-sum-lbl">예정</span></div>
+    <div class="sk-sum-item"><span class="sk-sum-num" style="color:var(--teal)">2</span><span class="sk-sum-lbl">연결됨</span></div>
+    <div class="sk-sum-item"><span class="sk-sum-num" style="color:var(--blue)">4</span><span class="sk-sum-lbl">Notion 페이지</span></div>
   </div>
 </section>
 
@@ -1190,8 +1212,8 @@
 
 <!-- ═══ FOOTER ═══ -->
 <div class="footer">
-  <p>AI 자동 주식 거래 시스템 구상안 · Claude Code + KIS MCP + Google Sheets 기반</p>
-  <p style="margin-top:6px;font-size:11px;">본 자료는 시스템 구조 설명을 위한 기획안입니다. 실제 투자는 개인의 판단과 책임 하에 이루어져야 합니다.</p>
+  <p>AI 자동 주식 거래 시스템 · 모의투자 운용 중 · Claude Code + KIS REST API + Notion 기반</p>
+  <p style="margin-top:6px;font-size:11px;">본 자료는 시스템 구조 설명을 위한 운영 설명서입니다. 실제 투자는 개인의 판단과 책임 하에 이루어져야 합니다.</p>
 </div>
 
 </body>

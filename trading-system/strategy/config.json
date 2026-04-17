@@ -29,7 +29,13 @@
       "rsi > rsi_overbought",
       "macd_cross_down"
     ],
-    "require_ema_bullish": false
+    "require_ema_bullish": false,
+    "test_mode": true,
+    "_test_mode_note": "테스트 기간 완화 조건: RSI < 50 단일 조건 (MACD 불필요). 실전 전환 시 test_mode: false",
+    "test_rsi_oversold": 60,
+    "test_require_macd": false,
+    "test_take_profit_pct": 2.0,
+    "test_stop_loss_pct": -2.0
   },
   "order": {
     "mode": "demo",

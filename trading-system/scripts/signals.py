@@ -19,34 +19,55 @@ def check_buy_signal(ind: dict, cfg: dict) -> tuple[bool, list[str]]:
     """
     매수 신호 판단
     반환: (신호여부, 매칭된 조건 목록)
+
+    test_mode=true  → RSI < test_rsi_oversold(기본 50) 단일 조건. MACD 불필요.
+    test_mode=false → RSI < rsi_oversold AND MACD 상향전환 (원래 운용 조건)
     """
     signal_cfg = cfg.get("signal", {})
     ind_cfg = cfg.get("indicators", {})
-
-    rsi_oversold = ind_cfg.get("rsi_oversold", 35)
+    test_mode = signal_cfg.get("test_mode", False)
     reasons = []
 
-    # RSI 과매도
-    rsi_ok = ind.get("rsi", 100) < rsi_oversold
-    if rsi_ok:
-        reasons.append(f"RSI={ind['rsi']:.1f} < {rsi_oversold} (과매도)")
-
-    # MACD 골든크로스 또는 히스토그램 상향전환
-    macd_ok = (
-        ind.get("macd_cross_up", False) or
-        (ind.get("macd_hist", 0) > 0 and ind.get("macd_hist_prev", 0) <= 0)
-    )
-    if macd_ok:
-        reasons.append(f"MACD 상향전환 (hist={ind.get('macd_hist', 0):.4f})")
-
-    # EMA 정렬 체크 (옵션)
+    # EMA 정렬 체크 (공통)
     ema_required = signal_cfg.get("require_ema_bullish", False)
     ema_ok = ind.get("ema_bullish", True) if ema_required else True
     if not ema_ok:
         return False, ["EMA 하락 추세 — 매수 차단"]
 
-    # 최종: RSI + MACD 둘 다 충족
-    triggered = rsi_ok and macd_ok
+    if test_mode:
+        # ── 테스트 모드: RSI 단일 조건 ──────────────────────────────
+        rsi_oversold = signal_cfg.get("test_rsi_oversold", 50)
+        require_macd = signal_cfg.get("test_require_macd", False)
+
+        rsi_ok = ind.get("rsi", 100) < rsi_oversold
+        if rsi_ok:
+            reasons.append(f"[TEST] RSI={ind['rsi']:.1f} < {rsi_oversold}")
+
+        macd_ok = (
+            ind.get("macd_cross_up", False) or
+            (ind.get("macd_hist", 0) > 0 and ind.get("macd_hist_prev", 0) <= 0)
+        )
+        if macd_ok and require_macd:
+            reasons.append(f"MACD 상향전환 (hist={ind.get('macd_hist', 0):.4f})")
+
+        triggered = rsi_ok and (macd_ok if require_macd else True)
+    else:
+        # ── 운용 모드: RSI + MACD 복합 조건 ────────────────────────
+        rsi_oversold = ind_cfg.get("rsi_oversold", 35)
+
+        rsi_ok = ind.get("rsi", 100) < rsi_oversold
+        if rsi_ok:
+            reasons.append(f"RSI={ind['rsi']:.1f} < {rsi_oversold} (과매도)")
+
+        macd_ok = (
+            ind.get("macd_cross_up", False) or
+            (ind.get("macd_hist", 0) > 0 and ind.get("macd_hist_prev", 0) <= 0)
+        )
+        if macd_ok:
+            reasons.append(f"MACD 상향전환 (hist={ind.get('macd_hist', 0):.4f})")
+
+        triggered = rsi_ok and macd_ok
+
     return triggered, reasons
 
 
@@ -54,13 +75,22 @@ def check_sell_signal(ind: dict, cfg: dict, entry_price: float) -> tuple[bool, s
     """
     매도 신호 판단
     반환: (신호여부, 사유)
+
+    test_mode=true  → test_take_profit_pct / test_stop_loss_pct 사용 (빠른 순환)
+    test_mode=false → order.take_profit_pct / order.stop_loss_pct 사용
     """
+    signal_cfg = cfg.get("signal", {})
     ind_cfg = cfg.get("indicators", {})
     order_cfg = cfg.get("order", {})
+    test_mode = signal_cfg.get("test_mode", False)
 
     rsi_overbought = ind_cfg.get("rsi_overbought", 70)
-    stop_loss_pct = order_cfg.get("stop_loss_pct", -3.0)
-    take_profit_pct = order_cfg.get("take_profit_pct", 5.0)
+    if test_mode:
+        stop_loss_pct = signal_cfg.get("test_stop_loss_pct", -2.0)
+        take_profit_pct = signal_cfg.get("test_take_profit_pct", 2.0)
+    else:
+        stop_loss_pct = order_cfg.get("stop_loss_pct", -3.0)
+        take_profit_pct = order_cfg.get("take_profit_pct", 5.0)
 
     current_price = ind.get("close", entry_price)
     pnl_pct = ((current_price - entry_price) / entry_price * 100) if entry_price > 0 else 0

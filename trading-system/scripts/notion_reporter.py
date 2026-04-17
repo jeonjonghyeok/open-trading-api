@@ -540,6 +540,108 @@ def _build_perf_rows(perf: dict) -> list:
     ]
 
 
+# 체결내역 페이지 ID (Notion 대시보드 하위 페이지)
+EXECUTION_PAGE_ID = "344275c10f8e81c5ba4dc47d1887a4b3"
+
+# 종목코드 → 종목명 매핑 (간이)
+_CODE_NAMES = {
+    "005930": "삼성전자",
+    "035720": "카카오",
+    "105560": "KB금융",
+    "000660": "SK하이닉스",
+    "035420": "NAVER",
+    "051910": "LG화학",
+    "006400": "삼성SDI",
+    "028260": "삼성물산",
+    "012330": "현대모비스",
+    "207940": "삼성바이오로직스",
+}
+
+
+def push_order_to_notion(
+    code: str,
+    side: str,
+    qty: int,
+    price: int,
+    order_no: str,
+    reason: str,
+    timestamp: str,
+) -> bool:
+    """
+    주문 즉시 Notion 체결내역 페이지에 행 추가
+    executor.py에서 실제 주문 성공 후 호출
+    """
+    ncfg = load_notion_config()
+    if not ncfg:
+        return False
+
+    token = ncfg["token"]
+
+    # ── 1. 페이지 children 조회 → 체결 테이블 블록 ID 탐색 ──
+    children_resp = notion_request("GET", f"/blocks/{EXECUTION_PAGE_ID}/children?page_size=50", token)
+    if not children_resp:
+        print("[NOTION] 체결내역 페이지 조회 실패")
+        return False
+
+    table_block_id = None
+    for block in children_resp.get("results", []):
+        if block.get("type") != "table":
+            continue
+        # 테이블 첫 행(헤더) 조회
+        tbl_children = notion_request("GET", f"/blocks/{block['id']}/children?page_size=5", token)
+        if not tbl_children:
+            continue
+        rows = tbl_children.get("results", [])
+        if not rows:
+            continue
+        first_cells = rows[0].get("table_row", {}).get("cells", [])
+        if not first_cells:
+            continue
+        header_text = first_cells[0][0].get("text", {}).get("content", "") if first_cells[0] else ""
+        if header_text == "시간":
+            table_block_id = block["id"]
+            break
+
+    if not table_block_id:
+        print("[NOTION] 체결 테이블 블록을 찾지 못했습니다")
+        return False
+
+    # ── 2. 새 행 데이터 구성 ──
+    time_str = timestamp[11:16] if len(timestamp) >= 16 else timestamp  # HH:MM
+    code_name = _CODE_NAMES.get(code, code)
+    side_label = "📈 매수" if side == "buy" else "📉 매도"
+    reason_short = reason[:60] if reason else "-"
+
+    def cell(text: str) -> list:
+        return [{"type": "text", "text": {"content": text}}]
+
+    new_row = {
+        "object": "block",
+        "type": "table_row",
+        "table_row": {
+            "cells": [
+                cell(time_str),
+                cell(code_name),
+                cell(code),
+                cell(side_label),
+                cell(f"{qty}주"),
+                cell(f"{price:,}원"),
+                cell("-"),
+                cell(reason_short),
+            ]
+        },
+    }
+
+    # ── 3. 테이블에 행 추가 ──
+    result = notion_request("PATCH", f"/blocks/{table_block_id}/children", token, {"children": [new_row]})
+    if result:
+        print(f"[NOTION] ✅ 체결내역 기록: {code_name}({code}) {side_label} {qty}주 @{price:,}원")
+        return True
+    else:
+        print("[NOTION] ❌ 체결내역 기록 실패")
+        return False
+
+
 def setup_notion_interactive():
     """최초 1회 Notion 설정 (토큰 + DB ID 저장)"""
     print("\n=== Notion 연동 설정 ===")

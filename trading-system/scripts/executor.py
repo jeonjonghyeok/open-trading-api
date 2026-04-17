@@ -11,6 +11,10 @@ from typing import Optional
 import sys
 sys.path.insert(0, os.path.dirname(__file__))
 import kis_helper as kis
+try:
+    from notion_reporter import push_order_to_notion as _push_notion
+except Exception:
+    _push_notion = None
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -62,13 +66,14 @@ def save_order(code: str, side: str, qty: int, price: int,
 
 
 def get_holdings() -> list:
-    """현재 보유 포지션 (orders.db 기반, 미청산 포지션)"""
+    """현재 보유 포지션 (orders.db 기반, 미청산 포지션 — DRY 주문 제외)"""
     conn = sqlite3.connect(DB_PATH)
     rows = conn.execute("""
         SELECT code, price AS entry_price,
                SUM(CASE WHEN side='buy' THEN qty ELSE -qty END) AS net_qty
         FROM orders
         WHERE status IN ('placed', 'filled')
+          AND order_no != 'DRY'
         GROUP BY code
         HAVING net_qty > 0
     """).fetchall()
@@ -101,7 +106,14 @@ def execute(code: str, action: dict, ind: dict, dry_run: bool = False) -> bool:
     if result:
         order_no = result.get("ODNO", "")
         print(f"  ✅ 주문 접수: {order_no}")
+        ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         save_order(code, side, qty, price, order_no=order_no, reason=reason, ind=ind)
+        # Notion 체결내역 즉시 기록 (실패해도 주문은 성공 처리)
+        if _push_notion:
+            try:
+                _push_notion(code, side, qty, price, order_no, reason, ts)
+            except Exception as e:
+                print(f"  [NOTION] 기록 오류 (무시): {e}")
         return True
     else:
         print(f"  ❌ 주문 실패")
